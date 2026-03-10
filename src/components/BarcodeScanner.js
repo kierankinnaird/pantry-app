@@ -12,7 +12,7 @@ export default function BarcodeScanner({ onDetected, onError }) {
 
     async function startScanner() {
       try {
-        const { BrowserMultiFormatReader, NotFoundException } = await import('@zxing/browser')
+        const { BrowserMultiFormatReader } = await import('@zxing/browser')
         const reader = new BrowserMultiFormatReader()
         readerRef.current = reader
 
@@ -35,8 +35,8 @@ export default function BarcodeScanner({ onDetected, onError }) {
             if (result) {
               onDetected(result.getText())
             }
-            // NotFoundException is thrown every frame when no barcode — ignore it
-            if (error && !(error instanceof NotFoundException)) {
+            // NotFoundException fires every frame with no barcode — ignore it
+            if (error && error.name !== 'NotFoundException') {
               console.warn('Scanner error:', error)
             }
           }
