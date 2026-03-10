@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,10 +18,11 @@ export default function LoginPage() {
     setLoading(true)
 
     const supabase = createClient()
+    const email = `${username.trim().toLowerCase()}@pantry.local`
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setError(error.message)
+      setError('Invalid username or password')
       setLoading(false)
     } else {
       router.push('/')
@@ -32,7 +33,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-6 py-12">
       <div className="mx-auto w-full max-w-sm">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-green-600 mb-4">
             <span className="text-2xl">🥫</span>
@@ -43,15 +43,16 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
             <input
-              type="email"
+              type="text"
               required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="you@example.com"
-              autoComplete="email"
+              placeholder="kieran"
+              autoComplete="username"
+              autoCapitalize="none"
             />
           </div>
 

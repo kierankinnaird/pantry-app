@@ -9,7 +9,7 @@ export default function SignupPage() {
   const router = useRouter()
   const [step, setStep] = useState('account') // 'account' | 'household'
   const [displayName, setDisplayName] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [householdMode, setHouseholdMode] = useState('create') // 'create' | 'join'
   const [householdName, setHouseholdName] = useState('')
@@ -19,6 +19,10 @@ export default function SignupPage() {
 
   async function handleAccountStep(e) {
     e.preventDefault()
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      setError('Username can only contain letters, numbers, - and _')
+      return
+    }
     if (password.length < 8) {
       setError('Password must be at least 8 characters')
       return
@@ -33,8 +37,8 @@ export default function SignupPage() {
     setLoading(true)
 
     const supabase = createClient()
+    const email = `${username.trim().toLowerCase()}@pantry.local`
 
-    // Sign up the user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -85,7 +89,6 @@ export default function SignupPage() {
       householdId = hh.id
     }
 
-    // Link profile to household
     const { error: profileError } = await supabase
       .from('profiles')
       .update({ household_id: householdId })
@@ -114,7 +117,6 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* Step indicator */}
         <div className="flex gap-2 mb-8">
           <div className="h-1 flex-1 rounded-full bg-green-600" />
           <div className={`h-1 flex-1 rounded-full transition-colors ${step === 'household' ? 'bg-green-600' : 'bg-gray-200'}`} />
@@ -134,15 +136,18 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="you@example.com"
+                placeholder="kieran"
+                autoCapitalize="none"
+                autoComplete="username"
               />
+              <p className="text-xs text-gray-400 mt-1">Letters, numbers, - and _ only</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
